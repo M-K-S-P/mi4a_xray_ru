@@ -1,4 +1,5 @@
 # Install Passwall + Xray core for Openwrt on Xiaomi 4a Gigabit
+# CURRENTLY WIP
 
 
 ## ✅ Recommended Openwrt Version : 22.03.5
@@ -14,7 +15,7 @@
 ### Run this command in openwrt remote ssh
 
 ```
-rm -f install_passwallx.sh && wget https://raw.githubusercontent.com/AmirhoseinArabhaji/Passwall-Xray-Xiaomi4aGigabit/main/install_passwallx.sh && chmod 777 install_passwallx.sh && sh install_passwallx.sh
+rm -f install_passwallx.sh && wget https://raw.githubusercontent.com/M-K-S-P/mi4a_xray_ru/main/install_passwallx.sh && chmod 777 install_passwallx.sh && sh install_passwallx.sh
 ```
 
 Done !
@@ -47,18 +48,9 @@ This is mandatory because the xray core is too big to be installed on the router
 
 ⚡ Full Automatic installation Packages Just in one step
 
-⚡ Install XRAY On Temp Space if You Don't Have Enough Disk Space (Smart)
-
-⚡ IRAN IP & Domain Traffic Direct (100%)
-
-⚡ Improve Performance
-
-⚡ Server WARP Connection Fixed
-
-⚡ Default Kill Switch
+if provided with cmd argument will download ip and domain lists and reroute only those
 
 ## To Do
-
 
 - [x] (Resolve Errors) I get some errors when installation, but it works fine
 - [x] Error in extracting custom panel (iam.zip)
@@ -75,3 +67,5 @@ This is mandatory because the xray core is too big to be installed on the router
 This script is based on the work of
 [https://github.com/amirhosseinchoghaei/Passwall](https://github.com/amirhosseinchoghaei/Passwall)
 but it has lots of improvements and bug fixes and also merged multiple scripts from different repositories into one.
+
+Same guy did the repo I forked this from, so uh, double kudos to him ig

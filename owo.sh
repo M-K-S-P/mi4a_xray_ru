@@ -1,14 +1,5 @@
 #!/bin/sh
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-MAGENTA='\033[0;35m'
-CYAN='\033[0;36m'
-GRAY='\033[0;37m'
-NC='\033[0m' # No Color
-
-
+source .env
 service passwall stop
 
 cd
@@ -26,7 +17,7 @@ if [ "$RESULT" == "sing" ]; then
     
     cd /tmp
     echo "Downloading latest version of Sing-Box ..."
-    wget -q https://github.com/AmirhoseinArabhaji/Passwall-Xray-Xiaomi4aGigabit/raw/main/sing.ipk
+    wget -q https://github.com/${REPO}/raw/main/sing.ipk
     
     if [[ -f sing.ipk ]]
     
@@ -65,7 +56,7 @@ if [ "$RESULT" == "sing" ]; then
     
     cd /tmp
     
-    wget -q https://github.com/AmirhoseinArabhaji/Passwall-Xray-Xiaomi4aGigabit/raw/main/iam.zip
+    wget -q https://github.com/${REPO}/raw/main/iam.zip
     
     unzip -o iam.zip -d /
     
@@ -89,7 +80,7 @@ fi
 
 cd /tmp
 echo "Downloading latest version of Xray-core ..."
-wget -q https://github.com/AmirhoseinArabhaji/Passwall-Xray-Xiaomi4aGigabit/raw/main/panel.ipk
+wget -q https://github.com/${REPO}/raw/main/panel.ipk
 
 if [[ -f panel.ipk ]]
 
@@ -128,7 +119,7 @@ cd /root/
 
 cd /tmp
 
-wget -q https://github.com/AmirhoseinArabhaji/Passwall-Xray-Xiaomi4aGigabit/raw/main/pass.ipk
+wget -q https://github.com/${REPO}/raw/main/pass.ipk
 
 unzip -o iam.zip -d /
 

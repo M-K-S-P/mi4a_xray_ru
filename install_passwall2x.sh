@@ -1,20 +1,12 @@
 #!/bin/bash
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-MAGENTA='\033[0;35m'
-CYAN='\033[0;36m'
-GRAY='\033[0;37m'
-NC='\033[0m' # No Color
-
+source .env
 
 echo "Running as root..."
 sleep 2
 clear
 
-uci set system.@system[0].zonename='Asia/Tehran'
-uci set system.@system[0].timezone='<+0330>-3:30'
+uci set system.@system[0].zonename='Asia/Krasnoyarsk'
+#uci set system.@system[0].timezone='<+0330>-3:30'
 
 uci commit system
 
@@ -100,7 +92,7 @@ opkg install boost
 
 cd /tmp
 
-wget -q https://github.com/AmirhoseinArabhaji/Passwall-Xray-Xiaomi4aGigabit/raw/main/iam.zip
+wget -q https://github.com/${REPO}/raw/main/iam.zip
 
 unzip -o iam.zip -d /
 
@@ -120,13 +112,12 @@ if [ "$RESULT" == "/usr/bin/xray" ]; then
     
 else
     
-    rm -f install_xray_core.sh && wget https://raw.githubusercontent.com/AmirhoseinArabhaji/Passwall-Xray-Xiaomi4aGigabit/main/install_xray_core.sh && chmod 777 install_xray_core.sh && sh install_xray_core.sh
+    rm -f install_xray_core.sh && wget https://raw.githubusercontent.com/${REPO}/main/install_xray_core.sh && chmod 777 install_xray_core.sh && sh install_xray_core.sh
     
 fi
 
 sleep 10
 
-dhcp.@dnsmasq[0].rebind_domain='www.ebanksepah.ir' 'my.irancell.ir'
 
 uci commit
 

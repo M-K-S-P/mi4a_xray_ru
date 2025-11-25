@@ -1,21 +1,12 @@
 #!/bin/bash
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-MAGENTA='\033[0;35m'
-CYAN='\033[0;36m'
-GRAY='\033[0;37m'
-NC='\033[0m' # No Color
-
-
+source .env
 
 echo "Running as root..."
 sleep 1
 clear
 
-uci set system.@system[0].zonename='Asia/Tehran'
-uci set system.@system[0].timezone='<+0330>-3:30'
+uci set system.@system[0].zonename='Asia/Krasnoyarsk'
+#uci set system.@system[0].timezone='<+0330>-3:30'
 
 uci commit system
 
@@ -40,7 +31,7 @@ if [ "$RESULT" == "23" ]; then
     while true; do
         read -p "Do you wish to install Passwall 2 (y or n)? " yn
         case $yn in
-            [Yy]* ) rm -f passwall2x.sh && wget https://raw.githubusercontent.com/AmirhoseinArabhaji/Passwall-Xray-Xiaomi4aGigabit/main/install_passwall2x.sh && chmod 777 install_passwall2x.sh && sh install_passwall2x.sh;;
+            [Yy]* ) rm -f passwall2x.sh && wget https://raw.githubusercontent.com/${REPO}/main/install_passwall2x.sh && chmod 777 install_passwall2x.sh && sh install_passwall2x.sh;;
             [Nn]* ) echo -e "${MAGENTA} BYE ;) ${MAGENTA}" & exit;;
             * ) echo "Please answer yes or no.";;
         esac
@@ -134,7 +125,7 @@ sleep 1
 
 cd /tmp
 
-wget -q https://github.com/AmirhoseinArabhaji/Passwall-Xray-Xiaomi4aGigabit/blob/main/iam.zip
+wget -q https://github.com/${REPO}/blob/main/iam.zip
 
 unzip -o iam.zip -d /
 
@@ -156,7 +147,7 @@ else
     
     cd /tmp/
     
-    wget -q https://github.com/AmirhoseinArabhaji/Passwall-Xray-Xiaomi4aGigabit/raw/main/pass.ipk
+    wget -q https://github.com/${REPO}/raw/main/pass.ipk
     
     opkg install pass.ipk
     
@@ -173,91 +164,71 @@ fi
 # Install xray core
 opkg install xray-core
 
-
-## IRAN IP BYPASS ##
-
-cd /usr/share/passwall/rules/
-
-
-if [[ -f direct_ip ]]
-
-then
-    
-    rm direct_ip
-    
-else
-    
-    echo "Stage 1 Passed"
-fi
-
-wget https://raw.githubusercontent.com/AmirhoseinArabhaji/Passwall-Xray-Xiaomi4aGigabit/main/direct_ip
-
-sleep 3
-
-if [[ -f direct_host ]]
-
-then
-    
-    rm direct_host
-    
-else
-    
-    echo "Stage 2 Passed"
-    
-fi
-
-wget https://raw.githubusercontent.com/AmirhoseinArabhaji/Passwall-Xray-Xiaomi4aGigabit/main/direct_host
-
-RESULT=`ls direct_ip`
-if [ "$RESULT" == "direct_ip" ]; then
-    echo -e "${GREEN}IRAN IP BYPASS Successfull !${NC}"
-    
-else
-    
-    echo -e "${RED}INTERNET CONNECTION ERROR!! Try Again ${NC}"
-    
-fi
-
 sleep 1
-
 
 RESULT=`ls /usr/bin/xray`
 
 if [ "$RESULT" == "/usr/bin/xray" ]; then
-    
     echo -e "${GREEN} Done ! ${NC}"
-    
 else
+    rm -f install_xray_core.sh && wget https://raw.githubusercontent.com/${REPO}/main/install_xray_core.sh && chmod 777 install_xray_core.sh && sh install_xray_core.sh
+fi
+
+uci commit system
+
+##  IP BYPASS ##
+
+sleep 1
+
+
+if [ $# -ne 0 ]; then
     
-    rm -f install_xray_core.sh && wget https://raw.githubusercontent.com/AmirhoseinArabhaji/Passwall-Xray-Xiaomi4aGigabit/main/install_xray_core.sh && chmod 777 install_xray_core.sh && sh install_xray_core.sh
+    RULES_DIR='/usr/share/passwall/rules'
+    cd $RULES_DIR
+    wget https://raw.githubusercontent.com/${REPO}/main/${direct_ip_path}
+    wget https://raw.githubusercontent.com/${REPO}/main/${direct_host_path}
+
+    uci set passwall.@global[0].tcp_proxy_mode='disable'
+    uci set passwall.@global[0].udp_proxy_mode='disable'
+    uci set passwall.@global_forwarding[0].tcp_redir_ports='disable'
+    uci set passwall.@global_forwarding[0].udp_redir_ports='disable'
+    uci set passwall.@global_forwarding[0].tcp_no_redir_ports='disable'
+    uci set passwall.@global_forwarding[0].udp_no_redir_ports='disable'
     
+    uci add passwall rules
+    uci set passwall.@rules[-1].enabled='1'
+    uci set passwall.@rules[-1].remarks='SelectiveProxy'
+    uci add_list passwall.@rules[-1].domain_list='${RULES_DIR}/$ipsum.lst'
+    uci add_list passwall.@rules[-1].ip_list='${RULES_DIR}/domains_all.lst'
+    uci set passwall.@rules[-1].action='proxy'
+    uci set passwall.@global[0].dns_mode='udp'
+    uci set passwall.@global[0].remote_dns='8.8.8.8'
+
+else
+    echo "direct ip and domain list download omitted, all traffic now proxied"
+    uci set passwall.@global[0].tcp_proxy_mode='global'
+    uci set passwall.@global[0].udp_proxy_mode='global'
+    uci set passwall.@global_forwarding[0].tcp_no_redir_ports='disable'
+    uci set passwall.@global_forwarding[0].udp_no_redir_ports='disable'
+    uci set passwall.@global_forwarding[0].udp_redir_ports='1:65535'
+    uci set passwall.@global_forwarding[0].tcp_redir_ports='1:65535'
+    uci set passwall.@global[0].remote_dns='8.8.4.4'
+    uci set passwall.@global[0].dns_mode='udp'
+    uci set passwall.@global[0].udp_node='tcp'
 fi
 
 sleep 1
 
-uci commit system
-
-uci set passwall.@global[0].tcp_proxy_mode='global'
-uci set passwall.@global[0].udp_proxy_mode='global'
-uci set passwall.@global_forwarding[0].tcp_no_redir_ports='disable'
-uci set passwall.@global_forwarding[0].udp_no_redir_ports='disable'
-uci set passwall.@global_forwarding[0].udp_redir_ports='1:65535'
-uci set passwall.@global_forwarding[0].tcp_redir_ports='1:65535'
-uci set passwall.@global[0].remote_dns='8.8.4.4'
-uci set passwall.@global[0].dns_mode='udp'
-uci set passwall.@global[0].udp_node='tcp'
-
 uci commit passwall
 
-dhcp.@dnsmasq[0].rebind_domain='www.ebanksepah.ir' 'my.irancell.ir'
 
 uci commit
 
 echo -e "${YELLOW}** Warning : Router Will Be Rebooted ... **${ENDCOLOR}"
 
-sleep 5
+sleep 2
 
-reboot
+reboot # might be unnecessary, check with /etc/init.d/passwall restart instead
 
 rm install_passwallx.sh 2> /dev/null
 
