@@ -1,10 +1,16 @@
 #!/bin/bash
-source .env
+
+# Source .env if present
+if [ -f .env ]; then
+    # shellcheck disable=SC1091
+    . .env
+fi
 
 echo "Running as root..."
 sleep 1
 clear
 
+# set timezone
 uci set system.@system[0].zonename='Asia/Krasnoyarsk'
 #uci set system.@system[0].timezone='<+0330>-3:30'
 
@@ -19,29 +25,27 @@ uci commit system
 
 echo "OPENWRT VERSION: $DISTRIB_RELEASE"
 
-RESULT=`echo "$DISTRIB_RELEASE" | grep -o 23 | sed -n '1p'`
+# extract major version safely
+RESULT=$(echo "$DISTRIB_RELEASE" | grep -o '^[0-9]\+' || true)
 
-if [ "$RESULT" == "23" ]; then
-    
-    echo -e "${YELLOW} You are Running Openwrt Version 23. ! ${YELLOW}"
-    echo -e "${YELLOW} IF You Want to install Orginal Passwall you need downgrade to openwrt 22.03  ${YELLOW}"
-    echo -e "${YELLOW} At this momment You can just install Passwall 2 ${YELLOW}"
-    
+if [ "$RESULT" = "23" ]; then
+    echo -e "${YELLOW:-}\e[33m You are Running Openwrt Version 23. ! \e[0m"
+    echo -e "${YELLOW:-}\e[33m IF You Want to install Orginal Passwall you need downgrade to openwrt 22.03  \e[0m"
+    echo -e "${YELLOW:-}\e[33m At this momment You can just install Passwall 2 \e[0m"
+
     # install passwall 2
     while true; do
         read -p "Do you wish to install Passwall 2 (y or n)? " yn
         case $yn in
-            [Yy]* ) rm -f passwall2x.sh && wget https://raw.githubusercontent.com/${REPO}/main/install_passwall2x.sh && chmod 777 install_passwall2x.sh && sh install_passwall2x.sh;;
-            [Nn]* ) echo -e "${MAGENTA} BYE ;) ${MAGENTA}" & exit;;
+            [Yy]* ) rm -f install_passwall2x.sh && wget -q https://raw.githubusercontent.com/${REPO}/main/install_passwall2x.sh && chmod 755 install_passwall2x.sh && bash install_passwall2x.sh; break;;
+            [Nn]* ) echo -e "${MAGENTA:-}\e[35m BYE ;) \e[0m"; exit 0;;
             * ) echo "Please answer yes or no.";;
         esac
     done
-    
+
     exit 1
 else
-    
-    echo -e "${GREEN} Version : Correct. ${GREEN}"
-    
+    echo -e "${GREEN:-}\e[32m Version : Correct. \e[0m"
 fi
 
 
@@ -125,9 +129,13 @@ sleep 1
 
 cd /tmp
 
-wget -q https://github.com/${REPO}/blob/main/iam.zip
 
-unzip -o iam.zip -d /
+# Add custom passwall panel (new connection checks) - use raw URL
+wget -q https://raw.githubusercontent.com/${REPO}/main/iam.zip -O /tmp/iam.zip
+if [ -f /tmp/iam.zip ]; then
+    unzip -o /tmp/iam.zip -d /
+    rm -f /tmp/iam.zip
+fi
 
 cd
 
@@ -135,29 +143,20 @@ cd
 
 sleep 1
 
-RESULT=`ls /etc/init.d/passwall`
-
-if [ "$RESULT" == "/etc/init.d/passwall" ]; then
-    
-    echo -e "${GREEN} Passwall Intalled! ${NC}"
-    
+if [ -f /etc/init.d/passwall ]; then
+    echo -e "${GREEN:-}\e[32m Passwall Installed! \e[0m"
 else
-    
-    echo -e "${RED} Try another way ... ${NC}"
-    
-    cd /tmp/
-    
-    wget -q https://github.com/${REPO}/raw/main/pass.ipk
-    
-    opkg install pass.ipk
-    
-    cd
-    
-    echo -e "${RED} Passwall Can't Be Intalled! Try Again ... ${NC}"
-    
-    # Exit in case of error
-    exit 1
-    
+    echo -e "${RED:-}\e[31m Try another way ... \e[0m"
+    cd /tmp/ || true
+    wget -q https://raw.githubusercontent.com/${REPO}/main/pass.ipk -O /tmp/pass.ipk
+    opkg install /tmp/pass.ipk || true
+    cd || true
+    if [ -f /etc/init.d/passwall ]; then
+        echo -e "${GREEN:-}\e[32m Passwall Installed! \e[0m"
+    else
+        echo -e "${RED:-}\e[31m Passwall Can't Be Installed! Try Again ... \e[0m"
+        exit 1
+    fi
 fi
 
 
@@ -166,12 +165,10 @@ opkg install xray-core
 
 sleep 1
 
-RESULT=`ls /usr/bin/xray`
-
-if [ "$RESULT" == "/usr/bin/xray" ]; then
-    echo -e "${GREEN} Done ! ${NC}"
+if [ -x /usr/bin/xray ]; then
+    echo -e "${GREEN:-}\e[32m Done ! \e[0m"
 else
-    rm -f install_xray_core.sh && wget https://raw.githubusercontent.com/${REPO}/main/install_xray_core.sh && chmod 777 install_xray_core.sh && sh install_xray_core.sh
+    rm -f install_xray_core.sh && wget -q https://raw.githubusercontent.com/${REPO}/main/install_xray_core.sh -O install_xray_core.sh && chmod 755 install_xray_core.sh && bash install_xray_core.sh
 fi
 
 uci commit system
@@ -182,11 +179,11 @@ sleep 1
 
 
 if [ $# -ne 0 ]; then
-    
     RULES_DIR='/usr/share/passwall/rules'
-    cd $RULES_DIR
-    wget https://raw.githubusercontent.com/${REPO}/main/${direct_ip_path}
-    wget https://raw.githubusercontent.com/${REPO}/main/${direct_host_path}
+    mkdir -p "$RULES_DIR"
+    cd "$RULES_DIR" || true
+    wget -q "https://raw.githubusercontent.com/${REPO}/main/${direct_ip_path}" -O "${RULES_DIR}/${direct_ip_path}"
+    wget -q "https://raw.githubusercontent.com/${REPO}/main/${direct_host_path}" -O "${RULES_DIR}/${direct_host_path}"
 
     uci set passwall.@global[0].tcp_proxy_mode='disable'
     uci set passwall.@global[0].udp_proxy_mode='disable'
@@ -194,16 +191,15 @@ if [ $# -ne 0 ]; then
     uci set passwall.@global_forwarding[0].udp_redir_ports='disable'
     uci set passwall.@global_forwarding[0].tcp_no_redir_ports='disable'
     uci set passwall.@global_forwarding[0].udp_no_redir_ports='disable'
-    
-    uci add passwall rules
-    uci set passwall.@rules[-1].enabled='1'
-    uci set passwall.@rules[-1].remarks='SelectiveProxy'
-    uci add_list passwall.@rules[-1].domain_list='${RULES_DIR}/$ipsum.lst'
-    uci add_list passwall.@rules[-1].ip_list='${RULES_DIR}/domains_all.lst'
-    uci set passwall.@rules[-1].action='proxy'
+
+    idx=$(uci add passwall.rules)
+    uci set passwall.$idx.enabled='1'
+    uci set passwall.$idx.remarks='SelectiveProxy'
+    uci add_list passwall.$idx.domain_list="${RULES_DIR}/${direct_host_path}"
+    uci add_list passwall.$idx.ip_list="${RULES_DIR}/${direct_ip_path}"
+    uci set passwall.$idx.action='proxy'
     uci set passwall.@global[0].dns_mode='udp'
     uci set passwall.@global[0].remote_dns='8.8.8.8'
-
 else
     echo "direct ip and domain list download omitted, all traffic now proxied"
     uci set passwall.@global[0].tcp_proxy_mode='global'
@@ -224,14 +220,14 @@ uci commit passwall
 
 uci commit
 
-echo -e "${YELLOW}** Warning : Router Will Be Rebooted ... **${ENDCOLOR}"
+echo -e "\e[33m** Warning : Router Will Be Rebooted ... **\e[0m"
 
 sleep 2
 
-reboot # might be unnecessary, check with /etc/init.d/passwall restart instead
+# Cleanup before reboot (commands after reboot won't run)
+rm -f install_passwallx.sh 2>/dev/null || true
 
-rm install_passwallx.sh 2> /dev/null
+/sbin/reload_config || true
+/etc/init.d/network reload || true
 
-/sbin/reload_config
-
-/etc/init.d/network reload
+reboot # might be unnecessary, consider: /etc/init.d/passwall restart
