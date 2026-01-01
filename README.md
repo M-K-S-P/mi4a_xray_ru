@@ -15,7 +15,7 @@
 ### Run this command in openwrt remote ssh
 
 ```
-rm -f install_passwallx.sh && wget https://raw.githubusercontent.com/M-K-S-P/mi4a_xray_ru/main/install_passwallx.sh && chmod 777 install_passwallx.sh && sh install_passwallx.sh
+rm -f install-passwallx.sh && wget https://raw.githubusercontent.com/M-K-S-P/mi4a_xray_ru/main/install-passwallx.sh -O install-passwallx.sh && chmod 755 install-passwallx.sh && bash install-passwallx.sh
 ```
 
 Done !
@@ -53,8 +53,8 @@ if provided with cmd argument will download ip and domain lists and reroute only
 ## To Do
 
 - [x] (Resolve Errors) I get some errors when installation, but it works fine
-- [x] Error in extracting custom panel (iam.zip)
-- [x] Rename `amir` and `amir2` to proper names
+- [x] Error in extracting custom panel (passwall-panel.zip)
+- [x] Rename `amir` and `amir2` to proper names (`passwall-init`, `passwall-init-v2`)
 - [x] Update `direct_ip` and `direct_host` files
 
 

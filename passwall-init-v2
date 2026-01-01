@@ -2,7 +2,7 @@
 
 start(){
 
-sh /root/owo.sh
+sh /root/install-passwall-panel.sh
 
 }
 

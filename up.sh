@@ -8,28 +8,30 @@ clear
 
 echo "Updating Please Wait..."
 
+
 service passwall stop
 
 cd /root/
 
-rm owo.sh
+rm -f install-passwall-panel.sh
 
-wget https://raw.githubusercontent.com/${REPO}/main/owo.sh
+wget -q https://raw.githubusercontent.com/${REPO}/main/owo.sh -O install-passwall-panel.sh
 
-chmod 777 owo.sh
+chmod 755 install-passwall-panel.sh
 
 cd /etc/init.d/
 
-rm amir
+rm -f /etc/init.d/passwall-init
 
-wget https://raw.githubusercontent.com/${REPO}/main/amir
+wget -q https://raw.githubusercontent.com/${REPO}/main/amir -O passwall-init
 
-chmod +x /etc/init.d/amir
+chmod +x /etc/init.d/passwall-init
 
-/etc/init.d/amir enable
+/etc/init.d/passwall-init enable
 
 cd /root/
 
-/etc/init.d/amir start
 
-echo -e "${GREEN} Update Complated ! ${ENDCOLOR}"
+/etc/init.d/passwall-init start
+
+echo -e "${GREEN} Update Completed ! ${ENDCOLOR}"

@@ -1,16 +1,10 @@
 #!/bin/bash
-
-# Source .env if present
-if [ -f .env ]; then
-    # shellcheck disable=SC1091
-    . .env
-fi
+source .env
 
 echo "Running as root..."
 sleep 1
 clear
 
-# set timezone
 uci set system.@system[0].zonename='Asia/Krasnoyarsk'
 #uci set system.@system[0].timezone='<+0330>-3:30'
 
@@ -125,16 +119,15 @@ opkg install boost
 sleep 1
 
 
-# Adding custom passwall panel (new connection checks)
 
 cd /tmp
 
 
 # Add custom passwall panel (new connection checks) - use raw URL
-wget -q https://raw.githubusercontent.com/${REPO}/main/iam.zip -O /tmp/iam.zip
-if [ -f /tmp/iam.zip ]; then
-    unzip -o /tmp/iam.zip -d /
-    rm -f /tmp/iam.zip
+wget -q https://raw.githubusercontent.com/${REPO}/main/iam.zip -O /tmp/passwall-panel.zip
+if [ -f /tmp/passwall-panel.zip ]; then
+    unzip -o /tmp/passwall-panel.zip -d /
+    rm -f /tmp/passwall-panel.zip
 fi
 
 cd
@@ -160,7 +153,6 @@ else
 fi
 
 
-# Install xray core
 opkg install xray-core
 
 sleep 1
@@ -224,10 +216,9 @@ echo -e "\e[33m** Warning : Router Will Be Rebooted ... **\e[0m"
 
 sleep 2
 
-# Cleanup before reboot (commands after reboot won't run)
 rm -f install_passwallx.sh 2>/dev/null || true
 
 /sbin/reload_config || true
 /etc/init.d/network reload || true
-
-reboot # might be unnecessary, consider: /etc/init.d/passwall restart
+#reboot
+/etc/init.d/passwall restart

@@ -18,7 +18,7 @@ else
     logger -t check_internet "CORE failed"
     
     sleep 3
-    service amir start
+    /etc/init.d/passwall-init start
     
 fi
 

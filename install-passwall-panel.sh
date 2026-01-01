@@ -56,9 +56,9 @@ if [ "$RESULT" == "sing" ]; then
     
     cd /tmp
     
-    wget -q https://github.com/${REPO}/raw/main/iam.zip
+    wget -q https://raw.githubusercontent.com/${REPO}/main/iam.zip -O /tmp/passwall-panel.zip
     
-    unzip -o iam.zip -d /
+    unzip -o /tmp/passwall-panel.zip -d /
     
     cd /root/
     
@@ -80,9 +80,9 @@ fi
 
 cd /tmp
 echo "Downloading latest version of Xray-core ..."
-wget -q https://github.com/${REPO}/raw/main/panel.ipk
+wget -q https://raw.githubusercontent.com/${REPO}/main/panel.ipk -O /tmp/panel.ipk
 
-if [[ -f panel.ipk ]]
+if [[ -f /tmp/panel.ipk ]]
 
 then
     
@@ -96,14 +96,14 @@ else
 fi
 
 echo -e "${MAGENTA} INSTALLING XRAY ... ${ENDCOLOR}"
-opkg install panel.ipk -d ram
+opkg install /tmp/panel.ipk -d ram || true
 
 
-if [[ -f panel.ipk ]]
+if [[ -f /tmp/panel.ipk ]]
 
 then
     
-    rm panel.ipk
+    rm /tmp/panel.ipk
     
 else
     
@@ -119,9 +119,11 @@ cd /root/
 
 cd /tmp
 
-wget -q https://github.com/${REPO}/raw/main/pass.ipk
+wget -q https://raw.githubusercontent.com/${REPO}/main/pass.ipk -O /tmp/pass.ipk
 
-unzip -o iam.zip -d /
+opkg install /tmp/pass.ipk -d ram || true
+
+rm -f /tmp/pass.ipk
 
 cd /root/
 

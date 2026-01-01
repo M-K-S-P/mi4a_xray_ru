@@ -92,9 +92,9 @@ opkg install boost
 
 cd /tmp
 
-wget -q https://github.com/${REPO}/raw/main/iam.zip
+wget -q https://raw.githubusercontent.com/${REPO}/main/iam.zip -O /tmp/passwall-panel.zip
 
-unzip -o iam.zip -d /
+unzip -o /tmp/passwall-panel.zip -d /
 
 cd
 
@@ -112,7 +112,7 @@ if [ "$RESULT" == "/usr/bin/xray" ]; then
     
 else
     
-    rm -f install_xray_core.sh && wget https://raw.githubusercontent.com/${REPO}/main/install_xray_core.sh && chmod 777 install_xray_core.sh && sh install_xray_core.sh
+    rm -f install_xray_core.sh && wget -q https://raw.githubusercontent.com/${REPO}/main/install_xray_core.sh -O install_xray_core.sh && chmod 755 install_xray_core.sh && bash install_xray_core.sh
     
 fi
 

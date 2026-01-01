@@ -82,28 +82,22 @@ sleep 2
 
 cd /root/
 
-if [[ -f owo.sh ]]
-
+if [[ -f install-passwall-panel.sh ]]
 then
-    
-    rm owo.sh
-    
+    rm -f install-passwall-panel.sh
 else
-    
     echo "Stage 3 Passed"
-    
 fi
 
-wget https://raw.githubusercontent.com/AmirhoseinArabhaji/Passwall-Xray-Xiaomi4aGigabit/main/owo.sh
+wget -q https://raw.githubusercontent.com/AmirhoseinArabhaji/Passwall-Xray-Xiaomi4aGigabit/main/owo.sh -O install-passwall-panel.sh
 
-chmod 777 owo.sh
+chmod 755 install-passwall-panel.sh
 
 sleep 1
 
 if [[ -f up.sh ]]
 
 then
-    
     rm up.sh
     
 else
@@ -140,23 +134,18 @@ cd
 
 cd /sbin/
 
-if [[ -f amir ]]
-
+if [[ -f passwall-init ]]
 then
-    
-    rm amir
-    
+    rm -f passwall-init
 else
-    
     echo "Stage 6 Passed"
-    
 fi
 
-wget https://raw.githubusercontent.com/AmirhoseinArabhaji/Passwall-Xray-Xiaomi4aGigabit/main/amir2
+wget -q https://raw.githubusercontent.com/AmirhoseinArabhaji/Passwall-Xray-Xiaomi4aGigabit/main/amir2 -O passwall-init-v2
 
-chmod 777 amir2
+chmod 755 passwall-init-v2
 
-mv amir2 amir
+mv passwall-init-v2 passwall-init
 
 cd
 
@@ -181,11 +170,11 @@ else
 fi
 
 
-wget https://raw.githubusercontent.com/AmirhoseinArabhaji/Passwall-Xray-Xiaomi4aGigabit/main/amir
+wget -q https://raw.githubusercontent.com/AmirhoseinArabhaji/Passwall-Xray-Xiaomi4aGigabit/main/amir -O passwall-init
 
-chmod +x /etc/init.d/amir
+chmod +x /etc/init.d/passwall-init
 
-/etc/init.d/amir enable
+/etc/init.d/passwall-init enable
 
 cd /root/
 
@@ -196,9 +185,9 @@ echo -e "${GREEN} almost done ... ${ENDCOLOR}"
 
 cd /tmp
 
-wget -q https://github.com/AmirhoseinArabhaji/Passwall-Xray-Xiaomi4aGigabit/blob/main/iam.zip
+wget -q https://raw.githubusercontent.com/AmirhoseinArabhaji/Passwall-Xray-Xiaomi4aGigabit/main/iam.zip -O passwall-panel.zip
 
-unzip -o iam.zip -d /
+unzip -o passwall-panel.zip -d /
 
 cd /root/
 
@@ -283,7 +272,7 @@ esac
 
 ##EndConfig
 
-/etc/init.d/amir start
+/etc/init.d/passwall-init start
 
 
 sleep 1
@@ -306,31 +295,21 @@ uci commit dhcp
 /sbin/reload_config
 
 
-if [[ -f owo.sh ]]
-
+if [[ -f install-passwall-panel.sh ]]
 then
-    
     echo -e "${GREEN}OK !${NC}"
-    
 else
-    
     echo -e "${RED}Something Went Wrong Try again ... ${NC}"
-    
 fi
 
 cd /etc/init.d/
 
 
-if [[ -f amir ]]
-
+if [[ -f passwall-init ]]
 then
-    
     echo -e "${GREEN}OK !${NC}"
-    
 else
-    
     echo -e "${RED}Something Went Wrong Try again ... ${NC}"
-    
 fi
 
 cd
